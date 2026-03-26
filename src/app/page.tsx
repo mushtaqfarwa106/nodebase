@@ -1,13 +1,19 @@
-import { Button } from "@/components/ui/button";
+import { prisma } from "@/lib/db";
 
-const Page = () => {
+export default async function TestPage() {
+  // This command tries to create a user in your database
+  const newUser = await prisma.user.create({
+    data: {
+      email: `user-${Math.random()}@test.com`,
+      name: "Test User",
+    },
+  });
+
   return (
-    <div className="min-h-screen min-w-screen flex items-center justify-center">
-      <Button>
-        Click me
-      </Button>
+    <div className="p-10">
+      <h1>Database Connection Successful!</h1>
+      <p>Created user with ID: {newUser.id}</p>
+      <p>Email: {newUser.email}</p>
     </div>
   );
-};
-
-export default Page;
+}
