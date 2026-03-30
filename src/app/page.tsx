@@ -1,19 +1,22 @@
-import { prisma } from "@/lib/db";
+import { getQueryClient, trpc } from "@/trpc/server";
+import { Client } from "./client";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { Suspense } from "react";
 
-export default async function TestPage() {
-  // This command tries to create a user in your database
-  const newUser = await prisma.user.create({
-    data: {
-      email: `user-${Math.random()}@test.com`,
-      name: "Test User",
-    },
-  });
+const Page = async () => {
+  const queryClient = getQueryClient();
+
+  void queryClient.prefetchQuery(trpc.getUsers.queryOptions());
 
   return (
-    <div className="p-10">
-      <h1>Database Connection Successful!</h1>
-      <p>Created user with ID: {newUser.id}</p>
-      <p>Email: {newUser.email}</p>
+    <div className="min-h-screen min-w-screen flex items-center justify-center">
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <Suspense fallback={<p>loading...</p>}>
+          <Client />
+        </Suspense>
+      </HydrationBoundary>
     </div>
   );
-}
+};
+
+export default Page;
