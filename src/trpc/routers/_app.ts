@@ -1,11 +1,15 @@
-import { baseProcedure, createTRPCRouter } from '../init';
-import prisma from '../../lib/db';
+import { baseProcedure, createTRPCRouter, protectedProcedure } from '../init';
+import { prisma } from '@/lib/db';
 
 export const appRouter = createTRPCRouter({
-  getUsers: baseProcedure.query(() => {
-    return prisma.user.findMany();
-  }),
+    getUsers: protectedProcedure.query(async ({ ctx }) => {
+        // This userId comes from your Better Auth session in context
+        return await prisma.account.findMany({
+            where: {
+                userId: ctx.auth.user.id,
+            },
+        });
+    }),
 });
 
-// export type definition of API
 export type AppRouter = typeof appRouter;
