@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 
 const loginSchema = z.object({
-  email: z.email("Please enter a valid email address"),
+  email: z.string().email("Please enter a valid email address"), // ✅ FIXED
   password: z.string().min(1, "Password is required"),
 });
 
@@ -45,44 +45,49 @@ export function LoginForm() {
   });
 
   const signInGithub = async () => {
-    await authClient.signIn.social({
-      provider: "github",
-    }, {
-      onSuccess: () => {
-        router.push("/");
-      },
-      onError: () => {
-        toast.error("Something went wrong");
-      },
-    });
+    await authClient.signIn.social(
+      { provider: "github" },
+      {
+        onSuccess: () => {
+          router.push("/");
+        },
+        onError: () => {
+          toast.error("Something went wrong");
+        },
+      }
+    );
   };
 
   const signInGoogle = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-    }, {
-      onSuccess: () => {
-        router.push("/");
-      },
-      onError: () => {
-        toast.error("Something went wrong");
-      },
-    });
+    await authClient.signIn.social(
+      { provider: "google" },
+      {
+        onSuccess: () => {
+          router.push("/");
+        },
+        onError: () => {
+          toast.error("Something went wrong");
+        },
+      }
+    );
   };
 
   const onSubmit = async (values: LoginFormValues) => {
-    await authClient.signIn.email({
-      email: values.email,
-      password: values.password,
-      callbackURL: "/",
-    }, {
-      onSuccess: () => {
-        router.push("/");
+    await authClient.signIn.email(
+      {
+        email: values.email,
+        password: values.password,
+        callbackURL: "/",
       },
-      onError: (ctx) => {
-        toast.error(ctx.error.message);
-      },
-    });
+      {
+        onSuccess: () => {
+          router.push("/");
+        },
+        onError: (ctx) => {
+          toast.error(ctx.error.message);
+        },
+      }
+    );
   };
 
   const isPending = form.formState.isSubmitting;
@@ -91,12 +96,8 @@ export function LoginForm() {
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader className="text-center">
-          <CardTitle>
-            Welcome back
-          </CardTitle>
-          <CardDescription>
-            Login to continue
-          </CardDescription>
+          <CardTitle>Welcome back</CardTitle>
+          <CardDescription>Login to continue</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -124,6 +125,7 @@ export function LoginForm() {
                     Continue with Google
                   </Button>
                 </div>
+
                 <div className="grid gap-6">
                   <FormField
                     control={form.control}
@@ -142,6 +144,7 @@ export function LoginForm() {
                       </FormItem>
                     )}
                   />
+
                   <FormField
                     control={form.control}
                     name="password"
@@ -159,10 +162,12 @@ export function LoginForm() {
                       </FormItem>
                     )}
                   />
+
                   <Button type="submit" className="w-full" disabled={isPending}>
                     Login
                   </Button>
                 </div>
+
                 <div className="text-center text-sm">
                   Don&apos;t have an account?{" "}
                   <Link href="/signup" className="underline underline-offset-4">
@@ -176,4 +181,4 @@ export function LoginForm() {
       </Card>
     </div>
   );
-};
+}
